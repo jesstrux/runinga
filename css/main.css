@@ -33,7 +33,14 @@ textarea {
     -webkit-app-region: no-drag;
 }
 
+strong{
+  font-family: "Roboto Medium", sans-serif;
+}
 
+.scrim{
+  position: absolute; height: 100%; width: 100%;top: 0;left: 0;
+}
+  
 #appBar{
     -webkit-app-region:drag;
     /*background: var(--app-bg);*/
@@ -48,9 +55,10 @@ textarea {
 }
 
 #titleHeader h1{
-    font-family: "Avenir Bold", serif;
-    color: #888;
-    font-size: 1.05em;
+    font-family: "Avenir Light", serif;
+    color: #000;
+    font-size: 0.95em;
+    padding: 4px 0;
 }
 
 #shell button{

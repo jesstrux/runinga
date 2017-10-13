@@ -53,28 +53,30 @@
 		color: #aaa
 	}
 
-	.show-item strong{
-		font-family: "Roboto Medium", sans-serif;
-	}
-
 	#loaderWrapper{
 		background: #f0f0f0;
 		position: absolute; 
 		top: 55px; left: 0; 
-		width: 100vw; height: calc(100vh - 145px);
+		width: 100vw;height: calc(100vh - 145px);
+		transition: opacity 0.35s ease-out;
+	}
+
+	#loaderWrapper:not(.visible){
+		opacity: 0;
+		pointer-events: none;
 	}
 </style>
 
 <div id="schedule" style="position: relative;">
 	<h2>Schedule for {{$ctrl.date}}</h2>
-	<div id="loaderWrapper" class="layout center-center" ng-if="$ctrl.scheduleLoading">
+	<div id="loaderWrapper" class="layout center-center" ng-class="{'visible' : $ctrl.scheduleLoading}">
 		<span class="loader"></span>
 	</div>
 
 	<div class="layout wrap">
-		<div class="show-item" ng-click="" ng-repeat="show in $ctrl.schedule.shows track by $index">
+		<div class="show-item" ng-click="$ctrl.onViewShow({show: show})" ng-repeat="show in $ctrl.schedule.shows track by $index">
 			<div class="image">
-				<img ng-src="{{show.avatar}}" alt="">
+				<img ng-src="{{show.poster}}" alt="">
 			</div>
 			<h3>
 				{{show.name}}

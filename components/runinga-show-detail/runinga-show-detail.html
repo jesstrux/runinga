@@ -1,0 +1,258 @@
+<style>
+    *{
+        
+    }
+    body{
+        background: #000;
+    }
+    #titleHeader{
+        position: relative;
+        padding: 8px 16px;
+    }
+
+    #appBar{
+        
+    }
+
+    button{
+        color: #999;
+    }
+
+    #appBar .zmdi{
+        color: #999;
+    }
+
+    #appBar .zmdi-favorite{
+        color: hotpink;
+    }
+
+    #titleHeader h1{
+        font-size: 0.75em;
+        color: #999;
+    }
+
+    main{
+        background: #000;
+        height: calc(100vh - 43.33px);
+        position: relative;
+    }
+
+    .image-holder{
+        height: 100%;
+        width: 43vw;
+        z-index: 1;
+        overflow: hidden;
+        border-radius: 2px;
+        padding: 16px;
+        padding-top: 3px;
+        padding-right: 0;
+    }
+
+    .image-holder .image{
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: #ddd;
+        -webkit-background-size: cover;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 0 16px rgba(0,0,0,0.05)
+    }
+
+    #showDetails{
+        position: relative;
+        padding: 14px 0;
+        padding-top: 0;
+        height: calc(100% + 4px);
+        margin-right: 0;
+        overflow: auto;
+    }
+
+    #showDetails .zmdi{
+        color: gold !important
+    }
+
+    #showDetails #content{
+        padding: 0 20px;
+    }
+    #showDetails h2{
+        margin-top: 8px;
+        font-size: 1.4em;
+        line-height: 1.3em;
+        margin-bottom: 12px;
+        font-family: "Avenir Bold";
+        color: #aaa;
+    }
+
+    #showDetails h6{
+        margin-top: -6px;
+        margin-bottom: 4px;
+    }
+
+    #showDetails h6 > span{
+        margin-bottom: 4px;
+        font-size: 0.9em;
+        display: block;
+    }
+
+    #showDetails h6 span > span:last-child{
+        line-height: 1.4em
+    }
+
+    #showDetails strong{
+        color: #5f5f5f !important;
+    }
+
+    #showDetails strong + span{
+        color: #999 !important;
+    }
+
+    #showDetails #showDescription{
+        margin-bottom: 12px; 
+        margin-top: 5px; 
+        line-height: 1.5em;
+        font-size: 1em;
+        color: #909090 !important;
+    }
+
+    #favButton{
+        padding: 8px 12px; 
+        padding-top: 9.5px; 
+        margin-bottom: 1em; 
+        max-width: 80%
+    }
+
+    #favButton.flat{
+        max-width: 100%
+    }
+
+    #trailersWrapper{
+        z-index: 2;
+        background: #000; 
+        overflow: auto; 
+        padding: 20px; 
+        padding-top: 32px;
+        transition: all 0.35s ease-out;
+    }
+
+    #trailersWrapper:not(.open){
+        transform: translateY(-30%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .trailer-item{
+        position: relative;
+        overflow: hidden;
+        width: calc(50% - 8px);
+        color: #555;
+        text-align: center;
+        align-self: flex-start;
+    }
+
+    .trailer-item .trailer-image{
+        height: 120px;
+        background-color: #777;
+        -webkit-background-size: cover; 
+        background-size: cover; 
+        background-position: center; 
+        margin-bottom: 8px;
+    }
+
+    .trailer-item .trailer-image i{
+        font-size: 3.2em;
+        color: #333
+    }
+</style>
+<div class="layout vertical">
+    <div id="trailersWrapper" class="scrim layout justified wrap"
+        ng-nicescroll 
+        nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.3, cursoropacitymax: 0.5, cursorwidth: '8px', cursorborder: 'none'}"
+        ng-class="{'open' : $ctrl.show_trailers}">
+        
+        <span ng-click="$ctrl.show_trailers = false" style="position: absolute; width: 30px; height: 30px; border-radius: 50%; top: 8px; left: 0; right: 0; margin: auto; z-index: 2; font-size: 24px; color: #ccc; background: rgba(255,255,255,0.3)" class="layout center-center">
+            <i class="zmdi zmdi-chevron-up"></i>
+        </span>
+
+        <div class="trailer-item"
+            ng-repeat="trailer in $ctrl.show.trailers">
+            <div class="trailer-image" style="background-image: url('http://img.youtube.com/vi/{{trailer.id}}/maxresdefault.jpg');">
+                <div class="scrim layout center-center" style="background: rgba(0,0,0,0.7);">
+                    <i class="zmdi zmdi-play-circle-outline"></i>
+                </div>
+            </div>
+            <h3>{{trailer.id}}</h3>
+        </div>
+    </div>
+
+    <div id="appBar" class="layout center">
+        <div id="titleHeader" class="layout center justified">
+            <h1 class="flex">{{$ctrl.show.name}}</h1>
+        </div>
+
+        <div id="shell" class="flex layout end-justified center">
+            <button ng-if="$ctrl.show.trailers" ng-click="$ctrl.show_trailers = true" style="font-size: 20px; margin-right: 16px; padding-top: 3px;">
+                <i class="zmdi zmdi-movie"></i>
+            </button>
+
+            <button ng-click="$ctrl.toggleFavorite($ctrl.show.name)" style="font-size: 20px; margin-right: 16px; margin-top: 3px;">
+                <i class="zmdi" 
+                    ng-class="{'zmdi-favorite-outline' : !$ctrl.show.faved,
+                    'zmdi-favorite' : $ctrl.show.faved}"></i>
+            </button>
+
+            <button ng-click="$ctrl.closeApp()" style="font-size: 24px;">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="layout">
+        <div class="image-holder">
+            <div class="image" style="background-image: url({{$ctrl.show.poster}});"></div>
+        </div>
+            
+        <div id="showDetails" class="flex layout"
+            ng-nicescroll 
+            nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.3, cursoropacitymax: 0.5, cursorwidth: '8px', cursorborder: 'none'}">
+            <div id="content" class="flex layou vertical justifie">
+                <div style="margin-bottom: 0.8em;">
+                    <h2>
+                        {{$ctrl.show.name}}
+                    </h2>
+                    <h6>
+                        <span>
+                            <strong>Network&nbsp;:&nbsp;</strong>
+                            <span>{{$ctrl.show.network}}</span>
+                        </span>
+                        <span>
+                            <strong>Genre(s)&nbsp;:&nbsp;</strong>
+                            <span>{{$ctrl.show.genre}}</span>
+                        </span>
+                    </h6>
+                    <div ng-if="$ctrl.show.rating" class="layout center">
+                        <strong style="font-size: 14px">IMDB&nbsp;</strong>
+                        <span>:&nbsp;</span>
+                        <rating-stars rating="$ctrl.show.rating" style="font-size: 1.4em"></rating-stars>
+                    </div>
+                    <p id="showDescription" ng-if="$ctrl.show.description">
+                        <span ng-if="$ctrl.expanded">
+                            {{$ctrl.show.description }}
+                        </span>
+                        <span ng-if="!$ctrl.expanded">
+                            {{$ctrl.show.description | limitTo: 45 }}...
+                        </span>
+                        <span style="color: red" ng-if="$ctrl.show.description.length > 45">
+                            <span ng-click="$ctrl.expanded = !$ctrl.expanded">show <span>{{!$ctrl.expanded ? 'more' : 'less'}}</span>
+                            </span>
+                        </span>
+                    </p>
+                </div>
+                <button id="favButton" ng-click="$ctrl.toggleFavorite($ctrl.show.name)" ng-class="{'flat' : $ctrl.show.faved}">
+                        <span ng-if="!$ctrl.show.faved">ADD TO</span>
+                        <span ng-if="$ctrl.show.faved">REMOVE FROM</span> FAVORITES
+                    </button>
+            </div>
+        </div>
+    </main>
+</div>

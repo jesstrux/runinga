@@ -21,6 +21,10 @@ RuningaApp.prototype = {
     
   },
 
+  viewShow: function(show){
+    alert("View show: " + show.name);
+  },
+
   minimizeApp : function(){
       require('electron').remote.getCurrentWindow().minimize();
   },

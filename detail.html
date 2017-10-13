@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="runinga">
+<head>
+    <meta charset="UTF-8">
+    <title>Runinga</title>
+
+    <!-- Styles -->
+    <link href="css/fonts.css" rel="stylesheet">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/mdi.min.css" rel="stylesheet">
+    <link href="css/flex.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+</head>
+<body>
+    <runinga-show-detail></runinga-show-detail>
+
+    <script src="node_modules/angular/angular.min.js"></script>
+    
+    <script src="node_modules/localforage/dist/localforage.min.js"></script>
+    <script src="node_modules/angular-localforage/dist/angular-localForage.min.js"></script>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquerynicescroll.js"></script>
+
+    <script src="node_modules/angular-nicescroll/angular-nicescroll.js"></script>
+    
+    <script>
+        angular
+        .module('runinga', 
+            ['LocalForageModule', 'angular-nicescroll', 'runinga.services']);
+    </script>
+    <script src="js/services.js"></script>
+
+    <!-- COMPONENTS -->
+    <script src="components/runinga-show-detail/runinga-show-detail.component.js"></script>
+    <script src="components/rating-stars/rating-stars.component.js"></script>
+</body>
+</html>

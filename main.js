@@ -12,23 +12,34 @@ app.on('window-all-closed', function () {
   }
 });
 
-let mainWindow;
-module.exports.mainWindow = mainWindow;
+let mainWindow, detailWindow;
+module.exports = {
+    mainWindow : mainWindow,
+    detailWindow: detailWindow
+};
 
 app.on('ready', function(){
     mainWindow = new BrowserWindow({
-        icon: path.join(__dirname, 'icon.png'),
+        icon: path.join(__dirname, 'tv.jpg'),
         // backgroundColor: '#F0F0F0',
         backgroundColor: '#000',
-        // height: 500, width: 700, 
-        height: 600, width: 900,
+        height: 330, width: 500, 
+        // height: 600, width: 900,
+        frame: false, 
+        show: false,
+        resizable: false
+    });
+
+    detailWindow = new BrowserWindow({
+        backgroundColor: '#F0F0F0',
+        height: 400, width: 700,
         frame: false, 
         show: false,
         resizable: false
     });
 
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
+        pathname: path.join(__dirname, 'detail.html'),
         protocol: 'file',
         slashes: true
     }));
