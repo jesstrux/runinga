@@ -1,0 +1,24 @@
+@font-face {
+    font-family: "Striped";
+    src: url("../fonts/Striped.otf")
+}
+
+@font-face {
+    font-family: "Avenir";
+    src: url("../fonts/Avenir/Avenir.otf")
+}
+
+@font-face {
+    font-family: "Avenir Light";
+    src: url("../fonts/Avenir/AvenirL.otf")
+}
+
+@font-face {
+    font-family: "Avenir Bold";
+    src: url("../fonts/Avenir/AvenirM.otf")
+}
+
+@font-face {
+    font-family: "Avenir Black";
+    src: url("../fonts/Avenir/AvenirB.otf")
+}

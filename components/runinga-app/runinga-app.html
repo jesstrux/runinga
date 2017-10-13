@@ -1,0 +1,38 @@
+<div class="layout vertical">
+    <div id="appBar" class="layout center">
+        <div id="titleHeader" class="layout center justified">
+            <h1 class="flex">Runinga</h1>
+        </div>
+
+        <div id="shell" class="flex layout end-justified center">
+            <button ng-click="$ctrl.minimizeApp()">
+                <i class="zmdi zmdi-minus"></i>
+            </button>
+
+            <button ng-click="$ctrl.closeApp()">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+
+    <main>
+        <schedule-fetcher
+            loading="$ctrl.scheduleLoading"
+            date="$ctrl.cur_date"
+            schedule="$ctrl.schedule"
+            on-schedule-change="$ctrl.setSchedule(schedule)"></schedule-fetcher>
+
+        <date-chooser date="$ctrl.cur_date"></date-chooser>
+            
+        <schedule-list 
+            date="$ctrl.cur_date" 
+            ng-nicescroll 
+            nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.2, cursoropacitymax: 1, cursorwidth: '6px', cursorborder: 'none'}" 
+            schedule-loading="$ctrl.scheduleLoading"
+            schedule="$ctrl.schedule"
+            on-show-clicked="showClicked(show)"
+            on-show-faved="showFaved(show)"
+            style="height: calc(100vh - 87.6px); overflow: auto;"
+            ></schedule-list>
+    </main>
+</div>

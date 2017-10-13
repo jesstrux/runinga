@@ -1,0 +1,90 @@
+<style>
+	#schedule{
+		padding: 0 20px;
+		padding-top: 20px;
+	}
+
+	#schedule h2{
+		font-size: 15px;
+		margin-bottom: 22px;
+		/*padding: 0 20px;*/
+	}
+
+	.show-item{
+		position: relative;
+		text-align: center;
+		width: calc(25% - 6px);
+		margin-right: 6px;
+		margin-bottom: 30px;
+	}
+
+	.show-item:not(:nth-child(even)){
+		/*margin-right: 20px;*/
+	}
+
+	.show-item .image{
+		height: 140px;
+		margin-bottom: 8px;
+	}
+
+	.show-item .image img{
+		height: 100%;
+	}
+
+	.show-item h3{
+		margin: auto;
+		overflow: hidden;
+		width: 90%;
+		white-space: nowrap;
+		-ms-text-overflow: ellipsis;
+		text-overflow: ellipsis;
+		font-size: 1em;
+		margin-bottom: 5px;
+	}
+
+	.show-item p{
+		font-size: 0.85em;
+		padding-bottom: 8px;
+		color: #777
+	}
+
+	.show-item p + p{
+		font-size: 0.7em;
+		color: #aaa
+	}
+
+	.show-item strong{
+		font-family: "Roboto Medium", sans-serif;
+	}
+
+	#loaderWrapper{
+		background: #f0f0f0;
+		position: absolute; 
+		top: 55px; left: 0; 
+		width: 100vw; height: calc(100vh - 145px);
+	}
+</style>
+
+<div id="schedule" style="position: relative;">
+	<h2>Schedule for {{$ctrl.date}}</h2>
+	<div id="loaderWrapper" class="layout center-center" ng-if="$ctrl.scheduleLoading">
+		<span class="loader"></span>
+	</div>
+
+	<div class="layout wrap">
+		<div class="show-item" ng-click="" ng-repeat="show in $ctrl.schedule.shows track by $index">
+			<div class="image">
+				<img ng-src="{{show.avatar}}" alt="">
+			</div>
+			<h3>
+				{{show.name}}
+			</h3>
+			<p>
+				{{show.episode}}
+			</p>
+			<p>
+				{{show.time}} &nbsp; - &nbsp; <strong>{{show.network}}</strong>
+			</p>
+		</div>
+	</div>
+</div>
