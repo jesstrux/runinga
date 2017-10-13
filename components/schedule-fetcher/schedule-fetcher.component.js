@@ -23,15 +23,6 @@ function ScheduleFetcher(Muse) {
 
 ScheduleFetcher.prototype = {
   $onInit: function() {
-    // console.log("Fetching schedule!");
-
-    // Muse.getSchedule("asa", "jailer")
-    //   .then(function(data){
-    //     console.log("Found schedule");
-    //   })
-    //   .catch(function(er){
-    //     console.log(er);
-    //   });
   },
 
   $onChanges: function(changes) {
@@ -47,12 +38,8 @@ ScheduleFetcher.prototype = {
     };
     this.loading = true;
 
-    console.log("Fetching schedule!");
-
     this.muse.getSchedule(this.date)
       .then(function(data){
-        console.log("Found schedule");
-        console.log(data);
         self.schedule = {
           date : this.date,
           shows : data

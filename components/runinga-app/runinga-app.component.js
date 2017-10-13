@@ -1,3 +1,8 @@
+const remote = require('electron').remote;
+const main = remote.require('./main.js');
+// var detailWindow;
+// detailWindow
+
 angular
   .module('runinga')
   .component('runingaApp', {
@@ -22,7 +27,8 @@ RuningaApp.prototype = {
   },
 
   viewShow: function(show){
-    alert("View show: " + show.name);
+    // alert("View show: " + show.name);
+    main.openShowDetails(show);
   },
 
   minimizeApp : function(){

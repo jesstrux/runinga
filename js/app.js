@@ -1,6 +1,6 @@
 angular
-.module('runinga', 
-	['angular-nicescroll','LocalForageModule'])
+    .module('runinga', 
+        ['LocalForageModule', 'angular-nicescroll', 'runinga.services'])
 
 .service('ngCopy', ['$window', function ($window) {
 	return function (toCopy) {

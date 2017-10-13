@@ -1,3 +1,5 @@
+const {ipcRenderer} = require('electron');
+
 angular
   .module('runinga')
   .component('runingaShowDetail', {
@@ -24,15 +26,20 @@ RuningaShowDetail.prototype = {
     //   console.log("Favorites cleared");
     // });
 
-    this.showService.clearShowsCache([])
-    .then(function(){
-      console.log("Shows cache was cleared!");
-    });
+    // this.showService.clearShowsCache([])
+    // .then(function(){
+    //   console.log("Shows cache was cleared!");
+    // });
     
-    this.show = {
-      name: "DC's Legends of Tomorrow"
-    };
-    this.getShowDetails(this.show.name);
+    // this.show = {
+    //   name: "DC's Legends of Tomorrow"
+    // };
+    var self = this;
+    ipcRenderer.on('view-show', (event, show) => {
+      console.log(show);
+      self.show = show;
+      self.getShowDetails(self.show.name);
+    });
   },
 
   $onChanges: function() {
@@ -85,6 +92,6 @@ RuningaShowDetail.prototype = {
   },
 
   closeApp : function(){
-      require('electron').remote.getCurrentWindow().close();
+      require('electron').remote.getCurrentWindow().hide();
   }
 }
