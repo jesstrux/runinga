@@ -3,7 +3,6 @@
 const {app, BrowserWindow, dialog, ipcMain} = require('electron');
 const path = require('path');
 const url = require('url');
-const tinycolor = require("tinycolor2");
 
 app.on('window-all-closed', function () {
   if (process.platform != 'darwin') {

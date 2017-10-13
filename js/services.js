@@ -1,9 +1,6 @@
 var sModule =  angular.module('runinga.services', []);
 const scrapeIt = require("scrape-it");
 const {dialog} = require('electron').remote;
-const globParent = require('glob-parent');
-const mainPath = require('path');
-const url = require('url');
 
 sModule.factory('Muse', function($http, $q) {
     return {
