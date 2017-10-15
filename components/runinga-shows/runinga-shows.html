@@ -1,9 +1,20 @@
 <shows-fetcher
-    loading="$ctrl.loading"
-    shows="$ctrl.shows"></shows-fetcher>
+    fetch="$ctrl.fetch"
+    query="$ctrl.cur_query"
+	loading="$ctrl.loading"
+    shows="$ctrl.shows"
+    on-append-complete="$ctrl.fetch = false"></shows-fetcher>
 
-<show-list 
+<show-filters
+    query="$ctrl.cur_query" 
+    filter="$ctrl.cur_filter"
+    search-shows="$ctrl.showSearch()"></show-filters>
+
+<show-list
+    fetch="$ctrl.fetch"
+	filter="$ctrl.cur_filter" 
     list-loading="$ctrl.loading"
     shows="$ctrl.shows"
     on-view-show="$ctrl.viewShow(show)"
-    on-show-faved="showFaved(show)"></show-list>
+    on-show-faved="showFaved(show)"
+    fetch-more-shows="$ctrl.fetchMoreShows()"></show-list>

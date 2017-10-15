@@ -17,7 +17,7 @@
 
 	#chooser i{
 		font-size: 24px;
-		padding: 8px;
+		padding: 8px 30px;
 		margin-right: 12px;
 	}
 </style>
@@ -26,7 +26,7 @@
 	<i ng-click="$ctrl.pickDate()" class="zmdi zmdi-calendar"></i>
 
 	<div class="flex layout justified">
-		<span ng-repeat="day in $ctrl.days" ng-click="$ctrl.setCurrent($index)" ng-class="{'active' : $ctrl.current == $index}">
+		<span class="flex" ng-repeat="day in $ctrl.days" ng-click="$ctrl.setCurrent($index)" ng-class="{'active' : $ctrl.current == $index}">
 			{{day}}
 		</span>
 	</div>

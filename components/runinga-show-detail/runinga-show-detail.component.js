@@ -44,8 +44,15 @@ RuningaShowDetail.prototype = {
 
       if(data.fetch)
         self.getShowDetails(data.show.name);
-      else
+      else{
+        console.log(data.show._links);
+        self.showService.fetchTrailers({_links: data.show._links});
         self.scope.$apply();
+      }
+    });
+
+    self.rootScope.$on("trailersFetched",function(e, data){
+      self.show.trailers = data.trailers;
     });
   },
 
@@ -61,9 +68,6 @@ RuningaShowDetail.prototype = {
       .then(function(info){
         console.log("Show info found!!");
         self.show = info;
-        self.rootScope.$on("trailersFetched",function(e, data){
-          self.show.trailers = data.trailers;
-        });
       })
       .catch(function(error){
         console.log("Show info couldn't be found!!");

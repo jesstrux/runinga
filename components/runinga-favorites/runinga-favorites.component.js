@@ -13,6 +13,7 @@ angular
 function RuningaFavorites(Favorites, $rootScope) {
   this.favs = Favorites;
   var self = this;
+  this.diff = 93.6;
   this.rootScope = $rootScope;
 }
 

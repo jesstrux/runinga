@@ -21,6 +21,13 @@ RuningaShows.prototype = {
     
   },
 
+  fetchMoreShows: function(){
+    if(!this.loading){
+      this.fetch = true;
+      console.log("Prompt fetch!");
+    }
+  },
+
   viewShow: function(show){
     ipcRenderer.send('open-show-details', {show: show, fetch: false});
   }

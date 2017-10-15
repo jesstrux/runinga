@@ -5,9 +5,9 @@
 	}
 
 	#showsList h2{
-		font-size: 15px;
+		font-size: 16px;
 		margin-bottom: 22px;
-		/*padding: 0 20px;*/
+		padding: 0 12px;
 	}
 
 	.show-item{
@@ -16,6 +16,7 @@
 		width: calc(25% - 6px);
 		margin-right: 6px;
 		margin-bottom: 30px;
+		transition: all 0.35s ease-out;
 	}
 
 	.show-item:not(:nth-child(even)){
@@ -24,7 +25,14 @@
 
 	.show-item .image{
 		height: 140px;
+		margin: auto;
 		margin-bottom: 8px;
+		width: 95.2px;
+		height: 140px;
+		background: #ddd;
+		-webkit-background-size: cover;
+		background-size: cover;
+		background-position: top;
 	}
 
 	.show-item .image img{
@@ -71,15 +79,22 @@
 <div id="showsList"
 	ng-nicescroll
     nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.7, cursoropacitymax: 0.7, cursorwidth: '8px', cursorborder: 'none', oneaxismousemode: true}"
-    style="height: calc(100vh - 52.33px); overflow-x: hidden !important; overflow-y: auto;">
+    style="height: calc(100vh - 93.6px); overflow-x: hidden !important; overflow-y: auto;">
+    <h2>{{$ctrl.titleMap[$ctrl.filter]}}</h2>
+
 	<div id="loaderWrapper" class="layout center-center" ng-class="{'visible' : $ctrl.listLoading}">
 		<span class="loader"></span>
 	</div>
 
-	<div class="layout wrap">
-		<div class="show-item" ng-click="$ctrl.onViewShow({show: show})" ng-repeat="show in $ctrl.shows track by $index">
-			<div class="image">
-				<img ng-src="{{show.poster}}" alt="">
+	<div class="layout wrap"
+		infinite-scroll="$ctrl.fetchMoreShows()" 
+		infinite-scroll-distance="2"
+		infinite-scroll-immediate-check="false"
+		infinite-scroll-parent="true"
+		infinite-scroll-disabled="$ctrl.listLoading || $ctrl.fetch">
+		<div class="show-item" ng-click="$ctrl.onViewShow({show: show})" ng-repeat="show in $ctrl.filtered_shows track by $index">
+			<div class="image" style="background-image: url('{{show.poster}}');">
+				<!-- <img ng-src="{{show.poster}}" alt=""> -->
 			</div>
 			<h3>
 				{{show.name}}

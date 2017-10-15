@@ -39,13 +39,100 @@ sModule.factory('Muse', function($http, $q) {
 
 sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Favorites) {
     var thisService = {
-        fetchShowsOnline: function(name){
+        fetchShowsOnlineNew: function(p){
+            var def = $q.defer();
+            var BASE_URL = "https://www.tvmaze.com/";
+            var full_url = p ? BASE_URL+"shows?page=" + p + "&" : BASE_URL+"shows?";
+            // var x = require('x-ray')();
+            // x(full_url + 'Show%5Bsort%5D=1', {
+            //   shows: x('.pricing-table', [{
+            //     name: '.bullet-item a',
+            //     poster: 'img@src'
+            //   }])
+            // })
+            // // .paginate('.pagination .next a@href')
+            // // .limit(2)
+            // (function (err, obj) {
+            //   // console.log(err, JSON.stringify(obj));
+            //   if(err != null){
+            //     def.reject(err);
+            //   }else{
+            //     // def.resolve(obj[0].shows.concat(obj[1].shows));
+            //     def.resolve(obj.shows);
+            //   }
+            // });
+
+            scrapeIt(full_url + 'Show%5Bsort%5D=1', {
+                shows: {
+                    listItem: ".pricing-table",
+                    data: {
+                        name: '.bullet-item a',
+                        poster: {
+                            selector: 'img',
+                            attr: 'src'
+                        }
+                    }
+                }
+            })
+            .then(page => {
+                def.resolve(page.shows);
+            })
+            .catch(err => {
+                def.reject(err);
+            });
+
+            return def.promise;
+        },
+        fetchShowsOnline: function(p){
             var def = $q.defer();
             var BASE_URL = "http://api.tvmaze.com/";
+            var full_url = p ? BASE_URL+"shows?page=" + p : BASE_URL+"shows";
 
             $http({
                 method: "GET",
-                url: BASE_URL+"shows"
+                url: full_url,
+                // +"&apikey="+API_KEY
+            }).then(function(response) {
+                if(response.status != 200){
+                    def.reject("Failed to fetch show listings!");
+                    return;
+                }
+                var shows = response.data
+                .map(function(info){
+                    return {
+                        poster: info.image ? info.image.original : info.image,
+                        name: info.name,
+                        network: info.network ? info.network.name : "",
+                        day: info.schedule.days.join(", "),
+                        time: info.schedule.time,
+                        genre: info.genres.join(", "),
+                        premiered: info.premiered ? info.premiered.substring(0,4) : info.premiered,
+                        status: info.status,
+                        continuing: info.status == "Running",
+                        popular: info.weight > 80,
+                        age: Math.round((Date.now() - new Date(info.premiered))/(1000*60*60*24*365)),
+                        description: info.summary ? info.summary.replace(/(<([^>]+)>)/ig, '') : info.summary,
+                        rating: info.rating.average / 2,
+                        _links: info._links
+                    };
+                });
+                def.resolve(shows);
+            })
+            .catch(function(error){
+                console.log(error);
+                def.reject("Failed to fetch show listings!");
+            });
+
+            return def.promise;
+        },
+
+        searchShows: function(query){
+            var def = $q.defer();
+            var BASE_URL = "http://api.tvmaze.com/search/shows?q=";
+
+            $http({
+                method: "GET",
+                url: BASE_URL+query
                 // +"&apikey="+API_KEY
             }).then(function(response) {
                 if(response.status != 200){
@@ -54,11 +141,11 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                 }
                 
                 var shows = response.data
-                .filter(e => e.weight > 80 && e.status == "Running")
-                .sort( (a, b) => b.weight - a.weight)
-                .map(function(info){
+                .map(function(data){
+                    var info = data.show;
+                    // return info;
                     return {
-                        poster: info.image.original,
+                        poster: info.image ? info.image.original : "",
                         name: info.name,
                         network: info.network ? info.network.name : "",
                         day: info.schedule.days.join(", "),
@@ -66,12 +153,14 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                         genre: info.genres.join(", "),
                         premiered: info.premiered,
                         status: info.status,
-                        description: info.summary.replace(/(<([^>]+)>)/ig, ''),
+                        continuing: info.status == "Running",
+                        popular: info.weight > 80,
+                        age: Math.round((Date.now() - new Date(info.premiered))/(1000*60*60*24*365)),
+                        description: info.summaru ? info.summary.replace(/(<([^>]+)>)/ig, '') : "",
                         rating: info.rating.average / 2,
                         _links: info._links
                     };
                 });
-
                 def.resolve(shows);
             })
             .catch(function(error){
@@ -95,39 +184,8 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                 thisService.fetchOnline(name)
                 .then(function(info){
                     def.resolve(info);
-
+                    thisService.fetchTrailers({_links: info._links});
                     thisService.cacheShow(info);
-
-                    var show_trailers = {};
-                    var count = 0;
-
-                    if(info._links.nextepisode)
-                        thisService.getShowTrailerLink(info._links.nextepisode.href)
-                        .then(function(next){
-                            next = next.substring(next.indexOf("embed/") + 6, next.length);
-
-                            show_trailers['next'] = {title: "Next Episode", id: next};
-                            count+=1;
-                            
-                            $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
-
-                            info.trailers = show_trailers;
-                            thisService.cacheShow(info);
-                        });
-                    else
-                        count+=1;
-
-                    thisService.getShowTrailerLink(info._links.previousepisode.href)
-                    .then(function(prev){
-                        prev = prev.substring(prev.indexOf("embed/") + 6, prev.length);
-                        show_trailers['previous'] = {title: "Previous Episode", id: prev};
-                        count+=1;
-
-                        $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
-
-                        info.trailers = show_trailers;
-                        thisService.cacheShow(info);
-                    });
                 })
                 .catch(function(error){
                     console.log(error);
@@ -201,13 +259,60 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
             return def.promise;
         },
 
+        fetchTrailers: function(info){
+            if(!info || !info._links)
+                return;
+            
+            var show_trailers = {};
+            var count = 0;
+
+            if(info._links.nextepisode)
+                thisService.getShowTrailerLink(info._links.nextepisode.href)
+                .then(function(next){
+                    if(!next)
+                        return;
+
+                    next = next.substring(next.indexOf("embed/") + 6, next.length);
+
+                    show_trailers['next'] = {title: "Next Episode", id: next};
+                    count+=1;
+                    
+                    $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
+
+                    info.trailers = show_trailers;
+
+                    if(info.name)
+                        thisService.cacheShow(info);
+                });
+            else
+                count+=1;
+
+            thisService.getShowTrailerLink(info._links.previousepisode.href)
+            .then(function(prev){
+                if(!prev)
+                    return;
+
+                prev = prev.substring(prev.indexOf("embed/") + 6, prev.length);
+                show_trailers['previous'] = {title: "Previous Episode", id: prev};
+                count+=1;
+                console.log("Prev trailer id: " + prev);
+                $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
+
+                info.trailers = show_trailers;
+                if(info.name)
+                    thisService.cacheShow(info);
+            });
+        },
+
         getShowTrailerLink: function(show_path){
             var show_path = show_path.replace("api", "www");
             var def = $q.defer();
+            
             scrapeIt(show_path, {
                 trailer: {
                     selector: "#episode-video iframe", 
-                    attr: "src", convert: x => !x || x.indexOf("//") != -1 ? x.replace("//", "http://") : x
+                    attr: "src"
+                    // , convert: x => !x || x.indexOf("//") != -1 ? x.replace("//", "http://") : x
                 }
             })
             .then(page => {
@@ -224,6 +329,8 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                 if(!shows)
                     shows = {};
 
+                console.log(show.name);
+                return;
                 var perma = show.name.replace("'", "").replace(" ", "_");
 
                 shows[perma] = show;
@@ -261,7 +368,6 @@ sModule.factory('Favorites', function($q, $localForage, $rootScope) {
             $localForage
             .getItem('favoriteShows')
             .then(function(shows){
-                console.log(shows);
                 if(!shows || !shows.length)
                     def.resolve(false);
                 else 
@@ -290,7 +396,6 @@ sModule.factory('Favorites', function($q, $localForage, $rootScope) {
                 thisService.setFavorites(shows)
                 .then(function(c){
                     def.resolve(!faved);
-                    console.log(faved);
                 });;
             });
 

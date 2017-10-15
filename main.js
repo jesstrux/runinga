@@ -39,6 +39,27 @@ const closeTemplate = [{
 }];
 const menu = Menu.buildFromTemplate(closeTemplate);
 
+const mainTemplate = [{
+    label: 'File',
+    submenu: [
+        {
+            label: 'DevTools', 
+            accelerator: 'F12',
+            click (item, focusedWindow) {
+                focusedWindow.toggleDevTools();
+            }
+        },
+        {
+            label: 'Reload', 
+            accelerator: 'F5',
+            click (item, focusedWindow) {
+                focusedWindow.reload();
+            }
+        }
+    ]
+}];
+const mainMenu = Menu.buildFromTemplate(mainTemplate);
+
 app.on('ready', function(){
     openMainWindow();
     // openDetailsWindow();
@@ -82,7 +103,7 @@ function openMainWindow() {
         resizable: false
     });
 
-    mainWindow.setMenu(menu);
+    mainWindow.setMenu(mainMenu);
 
     mainWindow.loadURL(`file://${__dirname}/index.html`);
 

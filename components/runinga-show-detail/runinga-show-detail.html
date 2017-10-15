@@ -118,7 +118,7 @@
     #favButton{
         padding: 8px 12px; 
         padding-top: 9.5px; 
-        margin-bottom: 1em; 
+        margin-bottom: 1.6em; 
         max-width: 80%
     }
 
@@ -257,6 +257,16 @@
                             <strong>Genre(s)&nbsp;:&nbsp;</strong>
                             <span>{{$ctrl.show.genre}}</span>
                         </span>
+                        <div>
+                            <span>
+                                <strong>Premiered&nbsp;:</strong>
+                                <span>{{$ctrl.show.premiered}}</span>
+                            </span>
+                            <span>
+                                <strong>&nbsp;Status&nbsp;:</strong>
+                                <span>{{$ctrl.show.status}}</span>
+                            </span>
+                        </div>
                     </h6>
                     <div ng-if="$ctrl.show.rating" class="layout center">
                         <strong style="font-size: 14px">IMDB&nbsp;</strong>
