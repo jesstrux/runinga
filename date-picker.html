@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="runinga">
+<head>
+    <meta charset="UTF-8">
+    <title>Runinga</title>
+
+    <!-- Styles -->
+    <link href="css/fonts.css" rel="stylesheet">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/mdi.min.css" rel="stylesheet">
+    <link href="css/flex.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="node_modules/flatpickr/dist/flatpickr.min.css">
+
+    <style>
+        #titleHeader h1{
+            font-size: 18px;
+        }
+        .flatpickr-wrapper{
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .flatpickr-calendar.inline{
+            top: -3px;
+        }
+    </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+</head>
+<body ng-controller="MainCtrl">
+    <div id="appBar" class="layout center">
+        <div id="titleHeader" class="layout center justified">
+            <h1 class="flex">Choose Date</h1>
+        </div>
+
+        <div id="shell" class="flex layout end-justified center">
+            <button onclick="closeApp()">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+
+    <main>
+        <div id="picker" styl="background: green; width: 300px; height: 300px;"></div>
+    </main>
+
+    <script>
+        const flatpickr = require("flatpickr");
+        const {ipcRenderer} = require('electron');
+        
+        const fp = flatpickr("#picker",{
+            maxDate: "today",
+            inline: true,
+            dateFormat: 'm/j/Y',
+            static: true,
+            onChange: function(selectedDates, dateStr, instance) {
+                ipcRenderer.send('date-picked', dateStr);
+            },
+        });
+
+        function closeApp(){
+            ipcRenderer.send('manage-window', {win: 'date-picker', action: "close"});
+        };
+    </script>
+</body>
+</html>

@@ -7,6 +7,7 @@ sModule.factory('Muse', function($http, $q) {
         getSchedule: function(date){
             var def = $q.defer();
             var schedule_url = "http://www.tvmuse.com/schedule.html?date="+date;
+            console.log(schedule_url);
             
             scrapeIt(schedule_url, {
                 schedule : {
@@ -38,6 +39,49 @@ sModule.factory('Muse', function($http, $q) {
 
 sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Favorites) {
     var thisService = {
+        fetchShowsOnline: function(name){
+            var def = $q.defer();
+            var BASE_URL = "http://api.tvmaze.com/";
+
+            $http({
+                method: "GET",
+                url: BASE_URL+"shows"
+                // +"&apikey="+API_KEY
+            }).then(function(response) {
+                if(response.status != 200){
+                    def.reject("Failed to fetch show listings!");
+                    return;
+                }
+                
+                var shows = response.data
+                .filter(e => e.weight > 80 && e.status == "Running")
+                .sort( (a, b) => b.weight - a.weight)
+                .map(function(info){
+                    return {
+                        poster: info.image.original,
+                        name: info.name,
+                        network: info.network ? info.network.name : "",
+                        day: info.schedule.days.join(", "),
+                        time: info.schedule.time,
+                        genre: info.genres.join(", "),
+                        premiered: info.premiered,
+                        status: info.status,
+                        description: info.summary.replace(/(<([^>]+)>)/ig, ''),
+                        rating: info.rating.average / 2,
+                        _links: info._links
+                    };
+                });
+
+                def.resolve(shows);
+            })
+            .catch(function(error){
+                console.log(error);
+                def.reject("Failed to fetch show listings!");
+            });
+
+            return def.promise;
+        },
+
         getDetails: function(name){
             var def = $q.defer();
 
@@ -54,7 +98,7 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
 
                     thisService.cacheShow(info);
 
-                    var show_trailers = [];
+                    var show_trailers = {};
                     var count = 0;
 
                     if(info._links.nextepisode)
@@ -62,7 +106,7 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                         .then(function(next){
                             next = next.substring(next.indexOf("embed/") + 6, next.length);
 
-                            show_trailers.push({title: "Next Episode", id: next});
+                            show_trailers['next'] = {title: "Next Episode", id: next};
                             count+=1;
                             
                             $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
@@ -76,7 +120,7 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                     thisService.getShowTrailerLink(info._links.previousepisode.href)
                     .then(function(prev){
                         prev = prev.substring(prev.indexOf("embed/") + 6, prev.length);
-                        show_trailers.push({title: "Previous Episode", id: prev});
+                        show_trailers['previous'] = {title: "Previous Episode", id: prev};
                         count+=1;
 
                         $rootScope.$broadcast('trailersFetched',{trailers:show_trailers});
@@ -112,10 +156,12 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
                     poster: info.image.original,
                     name: info.name,
                     network: info.network.name,
+                    day: info.schedule.days.join(", "),
+                    time: info.schedule.time,
                     genre: info.genres.join(", "),
                     premiered: info.premiered,
                     status: info.status,
-                    description: info.summary.replace('<p>', '').replace('</p>', ''),
+                    description: info.summary.replace(/(<([^>]+)>)/ig, ''),
                     rating: info.rating.average / 2,
                     _links: info._links
                 };
@@ -161,7 +207,7 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
             scrapeIt(show_path, {
                 trailer: {
                     selector: "#episode-video iframe", 
-                    attr: "src", convert: x => x.indexOf("//") != -1 ? x.replace("//", "http://") : x
+                    attr: "src", convert: x => !x || x.indexOf("//") != -1 ? x.replace("//", "http://") : x
                 }
             })
             .then(page => {
@@ -208,39 +254,44 @@ sModule.factory('ShowService', function($http, $q, $rootScope, $localForage, Fav
 });
 
 
-sModule.factory('Favorites', function($q, $localForage) {
+sModule.factory('Favorites', function($q, $localForage, $rootScope) {
     var thisService = {
         isFavorite: function(name){
             var def = $q.defer();
             $localForage
             .getItem('favoriteShows')
             .then(function(shows){
+                console.log(shows);
                 if(!shows || !shows.length)
                     def.resolve(false);
                 else 
-                    def.resolve(shows.indexOf(name) != -1);
+                    def.resolve(shows.findIndex(f => f.name === name) != -1);
             });
 
             return def.promise;
         },
-        toggleFavorite: function(name){
+        toggleFavorite: function(show){
+            var name = show.name;
             var def = $q.defer();
             thisService.getFavorites()
             .then(function(shows){
                 if(!shows)
                     shows = [];
 
-                var showIndex = shows.indexOf(name);
+                var showIndex = shows.findIndex((f) => f.name === name);
+                console.log(showIndex);
+
                 var faved = showIndex != -1;
                 if(faved)
                     shows.splice(showIndex, 1);
                 else
-                    shows.push(name);
+                    shows.push(show);
 
                 thisService.setFavorites(shows)
                 .then(function(c){
-                        def.resolve(!faved);
-                    });;
+                    def.resolve(!faved);
+                    console.log(faved);
+                });;
             });
 
             return def.promise;
@@ -262,6 +313,7 @@ sModule.factory('Favorites', function($q, $localForage) {
             $localForage
             .setItem('favoriteShows', favs)
             .then(function(){
+                $rootScope.$broadcast('favorites-changed', favs);
                 def.resolve(true);
             });
             return def.promise;

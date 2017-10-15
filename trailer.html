@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Runinga</title>
+
+    <!-- Styles -->
+    <link href="css/reset.css" rel="stylesheet">
+    
+    <style>
+        body{
+            overflow: hidden;
+        }
+        main{
+            background: #000 !important;
+        }
+
+        button{
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            z-index: 1;
+            background-color: transparent;
+            border: none;
+        }
+    </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+</head>
+<body>
+    <button onclick="closeApp()">
+        <svg fill="#ddd" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+
+    <main>
+        <iframe id="iframe" width="640" height="360" frameborder="0" allowfullscreen></iframe>
+    </main>
+
+    <script>
+        const {ipcRenderer} = require('electron');
+        const frame = document.querySelector("#iframe");
+
+        ipcRenderer.on('load-trailer', function(e, id){
+            var extras = "?autoplay=1&controls=0&fs=0&rel=0&showinfo=0"
+            var full = "https://www.youtube.com/embed/" + id + extras;
+            iframe.setAttribute("src", full);
+        });
+
+        function closeApp(){
+            ipcRenderer.send('manage-window', {win: 'trailer', action: "close"});
+        };
+    </script>
+</body>
+</html>

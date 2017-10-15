@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="runinga">
+<head>
+    <meta charset="UTF-8">
+    <title>Runinga</title>
+
+    <!-- Styles -->
+    <link href="css/fonts.css" rel="stylesheet">
+    <link href="css/reset.css" rel="stylesheet">
+    <link href="css/mdi.min.css" rel="stylesheet">
+    <link href="css/flex.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="node_modules/flatpickr/dist/flatpickr.min.css">
+
+    <style>
+        #appBar{
+            height: 45px;
+            border-bottom: 1px solid #f4f4f4;
+        }
+        #titleHeader h1{
+            font-size: 18px;
+        }
+
+        main{
+            padding: 20px;
+        }
+
+        .btn{
+            border: none;
+            background: #e9e9e9;
+            color: #777;
+            font-size: 10px;
+            padding: 8px;
+            text-transform: uppercase;
+        }
+
+        .btn:active{
+            background: #e0e0e0;
+        }
+
+        .settings-group{
+            
+        }
+
+        .settings-group h5{
+            color: #999;
+            font-size: 1em;
+            margin-bottom: 4px;
+            font-family: "Avenir Bold";
+        }
+
+        .setting{
+            position: relative;
+            padding: 12px 0px;
+            padding-right: 20px;
+        }
+
+        .setting + .btn{
+            top: -14px !important;
+        }
+
+        .setting i{
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: -12px;
+            height: 30px;
+            width: 30px;
+            margin: auto;
+        }
+
+        .setting i:before{
+            content: '\f279';
+        }
+
+        .setting input[type="checkbox"]{
+            display: none;
+        }
+
+        .setting input:checked + i:before{
+            content: '\f26a';
+        }
+
+        .setting h3{
+            font-size: 1em;
+            font-family: "Avenir";
+            margin-bottom: 4px;
+        }
+
+        .setting p{
+            font-size: 0.9em;
+            font-family: "Avenir Light";
+            margin-bottom: 12px;
+        }
+    </style>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+</head>
+<body ng-controller="MainCtrl">
+    <div id="appBar" class="layout center">
+        <div id="titleHeader" class="layout center justified">
+            <h1 class="flex">Settings</h1>
+        </div>
+
+        <div id="shell" class="flex layout end-justified center">
+            <button onclick="closeApp()">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+
+    <main>
+        <div class="settings-group">
+            <h5>Schedules</h5>
+            <div class="setting">
+                <label for="cache">
+                    <h3>Favorites Only</h3>
+                    <p>Only show schedules for favorite shows.</p>
+                </label>
+                <input type="checkbox" id="cache">
+                <i class="zmdi"></i>
+            </div>
+
+            <button class="btn" onclick="clearFavorites()">Clear Favorites</button>
+        </div>
+
+        <div class="settings-group">
+            <h5>Shows</h5>
+            <div class="setting">
+                <label fo="cache">
+                    <h3>Show Caching</h3>
+                    <p>Shows are cached for faster viewing.</p>
+                </label>
+                <!-- <input type="checkbox" id="cache"> -->
+                <!-- <i class="zmdi"></i> -->
+            </div>
+
+            <button class="btn" onclick="clearCache()">Clear Cache</button>
+        </div>
+    </main>
+
+    <script>
+        const flatpickr = require("flatpickr");
+        const {ipcRenderer} = require('electron');
+
+        ipcRenderer.on('shows-uncached', (event) => {
+            let clearCacheNotif = new Notification('Cache cleared!', {
+              body: 'Your Show cache was successfully cleared!',
+              icon: "icon.png"
+            });
+        });
+
+        ipcRenderer.on('favorite-shows-cleared', (event) => {
+            // confirm("Favorites cleared!");
+            let emptyFavsNotif = new Notification('Favorites emptied!', {
+              body: 'Your favorites were successfully emptied.',
+              icon: "icon.png"
+            });
+
+            emptyFavsNotif.onclick = () => {
+              console.log('Notification clicked')
+            };
+        });
+
+        function clearCache(){
+            ipcRenderer.send('clear-shows-cache');
+        }
+
+        function clearFavorites(){
+            ipcRenderer.send('clear-favorites');
+        }
+
+        function closeApp(){
+            ipcRenderer.send('manage-window', {win: 'prefs', action: "close"});
+        };
+    </script>
+</body>
+</html>

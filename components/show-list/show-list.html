@@ -1,10 +1,10 @@
 <style>
-	#schedule{
+	#showsList{
 		padding: 0 20px;
 		padding-top: 20px;
 	}
 
-	#schedule h2{
+	#showsList h2{
 		font-size: 15px;
 		margin-bottom: 22px;
 		/*padding: 0 20px;*/
@@ -68,23 +68,22 @@
 	}
 </style>
 
-<div id="schedule" style="position: relative;">
-	<h2>Schedule for {{$ctrl.date}}</h2>
-	<div id="loaderWrapper" class="layout center-center" ng-class="{'visible' : $ctrl.scheduleLoading}">
+<div id="showsList"
+	ng-nicescroll
+    nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.7, cursoropacitymax: 0.7, cursorwidth: '8px', cursorborder: 'none', oneaxismousemode: true}"
+    style="height: calc(100vh - 52.33px); overflow-x: hidden !important; overflow-y: auto;">
+	<div id="loaderWrapper" class="layout center-center" ng-class="{'visible' : $ctrl.listLoading}">
 		<span class="loader"></span>
 	</div>
 
 	<div class="layout wrap">
-		<div class="show-item" ng-click="$ctrl.onViewShow({show: show})" ng-repeat="show in $ctrl.schedule.shows track by $index">
+		<div class="show-item" ng-click="$ctrl.onViewShow({show: show})" ng-repeat="show in $ctrl.shows track by $index">
 			<div class="image">
 				<img ng-src="{{show.poster}}" alt="">
 			</div>
 			<h3>
 				{{show.name}}
 			</h3>
-			<p>
-				{{show.episode}}
-			</p>
 			<p>
 				{{show.time}} &nbsp; - &nbsp; <strong>{{show.network}}</strong>
 			</p>

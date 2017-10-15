@@ -9,16 +9,23 @@ angular
     bindings: {
       date: '<',
       loading: '=',
-      schedule: '='
+      schedule: '=',
+      error: '='
     },
     controller: ScheduleFetcher
   });
   
-  ScheduleFetcher.$inject = ['Muse'];
+  ScheduleFetcher.$inject = ['Muse', '$rootScope'];
 
-function ScheduleFetcher(Muse) {
+function ScheduleFetcher(Muse, $rootScope) {
   this.muse = Muse;
   var self = this;
+  self.rootScope = $rootScope;
+
+  self.rootScope.$on('refetch-schedule', function(){
+    console.log("Refetching schedule!!");
+    self.fetchSchedule();
+  });
 }
 
 ScheduleFetcher.prototype = {
@@ -37,6 +44,7 @@ ScheduleFetcher.prototype = {
       shows : []
     };
     this.loading = true;
+    self.error = false;
 
     this.muse.getSchedule(this.date)
       .then(function(data){
@@ -50,6 +58,15 @@ ScheduleFetcher.prototype = {
       .catch(function(er){
         console.log(er);
         self.loading = false;
+        self.error = true;
+
+        window.addEventListener('online',  function(){
+          if(self.error){
+            console.log("Network returned, retrying!!");
+            self.loading = true;
+            self.fetchSchedule();
+          }
+        })
       });
   }
 }

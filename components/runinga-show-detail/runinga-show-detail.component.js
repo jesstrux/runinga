@@ -10,35 +10,42 @@ angular
     controller: RuningaShowDetail
   });
 
-RuningaShowDetail.$inject = ['ShowService', 'Favorites', '$rootScope'];
+RuningaShowDetail.$inject = ['ShowService', 'Favorites', '$rootScope', '$scope'];
 
-function RuningaShowDetail(ShowService, Favorites, $rootScope) {
+function RuningaShowDetail(ShowService, Favorites, $rootScope, $scope) {
   var self = this;
   this.showService = ShowService;
   this.favService = Favorites;
   this.rootScope = $rootScope;
+  this.scope = $scope;
+
+  self.setFaved = function(name){
+    console.log("Settings faved");
+
+    this.favService.isFavorite(name)
+      .then(function(answer){
+        self.faved = answer;
+      })
+      .catch(function(error){
+        self.show.faved = false;
+        // console.log(error);
+        // return false;
+      });
+  }
 }
 
 RuningaShowDetail.prototype = {
   $onInit: function() {
-    // this.showService.setFavorites([])
-    // .then(function(){
-    //   console.log("Favorites cleared");
-    // });
-
-    // this.showService.clearShowsCache([])
-    // .then(function(){
-    //   console.log("Shows cache was cleared!");
-    // });
-    
-    // this.show = {
-    //   name: "DC's Legends of Tomorrow"
-    // };
     var self = this;
-    ipcRenderer.on('view-show', (event, show) => {
-      console.log(show);
-      self.show = show;
-      self.getShowDetails(self.show.name);
+    ipcRenderer.on('view-show', (event, data) => {
+      self.show = data.show;
+      console.log(data);
+      self.setFaved(data.show.name);
+
+      if(data.fetch)
+        self.getShowDetails(data.show.name);
+      else
+        self.scope.$apply();
     });
   },
 
@@ -64,23 +71,13 @@ RuningaShowDetail.prototype = {
       });
   },
 
-  isFavorite: function(name){
-    this.favService.isFavorite(name)
-      .then(function(answer){
-        return answer;
-      })
-      .catch(function(error){
-        console.log(error);
-        return false;
-      });
-  },
-
   toggleFavorite: function(name){
     var self = this;
-    this.favService.toggleFavorite(name)
+    this.favService.toggleFavorite(self.show)
       .then(function(state){
         var show = self.show;
         show.faved = state;
+        self.faved = state;
         self.show = show;
 
         self.showService.cacheShow(show);
@@ -91,7 +88,11 @@ RuningaShowDetail.prototype = {
       });
   },
 
+  viewTrailer : function(which){
+      ipcRenderer.send('view-trailer', this.show.trailers[which].id);
+  },
+
   closeApp : function(){
-      require('electron').remote.getCurrentWindow().hide();
+      ipcRenderer.send('manage-window', {win: 'show-detail', action: "close"});
   }
 }

@@ -1,0 +1,11 @@
+<div ng-if="!$ctrl.loading && !$ctrl.shows.length" class="layout center-center" style="position: relative; width: 100%; height: 450px;">
+	<p style="font-size: 1.5em; line-height: 1.5em; text-align: center;">
+		You haven't added any shows <br> to your favorites list.
+	</p>
+</div>
+
+<show-list 
+    list-loading="$ctrl.loading"
+    shows="$ctrl.shows"
+    on-view-show="$ctrl.viewShow(show)"
+    on-show-faved="showFaved(show)"></show-list>

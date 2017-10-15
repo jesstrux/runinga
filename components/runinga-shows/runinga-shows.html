@@ -1,0 +1,9 @@
+<shows-fetcher
+    loading="$ctrl.loading"
+    shows="$ctrl.shows"></shows-fetcher>
+
+<show-list 
+    list-loading="$ctrl.loading"
+    shows="$ctrl.shows"
+    on-view-show="$ctrl.viewShow(show)"
+    on-show-faved="showFaved(show)"></show-list>

@@ -1,0 +1,36 @@
+<schedule-fetcher
+    error="$ctrl.error"
+    loading="$ctrl.scheduleLoading"
+    date="$ctrl.cur_date"
+    schedule="$ctrl.schedule"
+    on-schedule-change="$ctrl.setSchedule(schedule)"></schedule-fetcher>
+
+<date-chooser 
+    date="$ctrl.cur_date"
+    picked-date="$ctrl.picked_date" 
+    pick-date="$ctrl.showDatePicker()"></date-chooser>
+
+<schedule-list 
+    ng-if="$ctrl.scheduleLoading || $ctrl.schedule.shows.length"
+    date="$ctrl.cur_date" 
+    ng-nicescroll
+    nice-option="{cursorcolor: '#aaa', cursoropacitymin: 0.7, cursoropacitymax: 0.7, cursorwidth: '8px', cursorborder: 'none', oneaxismousemode: true}" 
+    schedule-loading="$ctrl.scheduleLoading"
+    schedule="$ctrl.schedule"
+    on-view-show="$ctrl.viewShow(show)"
+    on-show-faved="showFaved(show)"
+    style="height: calc(100vh - 93.6px); overflow-x: hidden !important; overflow-y: auto;"
+    ></schedule-list>
+
+<div ng-if="!$ctrl.scheduleLoading && !$ctrl.schedule.shows.length" class="layout center-center" style="height: 400px;">
+    <p style="font-size: 1.5em; line-height: 1.5em; text-align: center;">
+        <span ng-if="!$ctrl.error">
+            We couldn't find the schedule for <br> <span style="color: #f00">{{$ctrl.cur_date}}</span>.
+        </span>
+
+        <span ng-if="$ctrl.error">
+            A network error occured, make<br>
+            sure you're connected then <span style="color: red" ng-click="$ctrl.reFetchSchedule()"> &nbsp;RETRY</span>.
+        </span>
+    </p>
+</div>    

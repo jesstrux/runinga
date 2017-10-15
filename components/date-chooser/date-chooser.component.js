@@ -7,14 +7,33 @@ angular
   .component('dateChooser', {
     bindings: {
       date: '=',
-      onDateChanged: '&'
+      pickDate: '&'
     },
     templateUrl: "components/date-chooser/date-chooser.html",
     controller: DateChooser
   });
 
-function DateChooser($rootScope) {
+  DateChooser.$inject = ['$scope','$rootScope'];
+function DateChooser($scope, $rootScope) {
+  this.rootScope = $rootScope;
   
+  $scope.$watch(
+      "DateChooser.date",
+      function handleFooChange( newValue, oldValue ) {
+          console.log( "DateChooser.date:", newValue );
+      }
+  );
+
+  this.setCurrent = function(idx, date){
+    if(!date){
+      this.current = idx;
+      this.date = this.dates[idx];
+    }else{
+      this.current = this.dates.findIndex((d) => d === date);
+      this.date = date;
+      $scope.$apply();
+    }
+  }
 }
 
 DateChooser.prototype = {
@@ -29,25 +48,21 @@ DateChooser.prototype = {
     week_end.setDate(week_end.getDate() + (6 - today));
 
     this.dates = getDates(week_start, week_end).map(function(d){
-      return d.getMonth() + "/" + d.getDate() + "/" + d.getFullYear();
+      return parseInt(d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
     });
 
     this.date = this.dates[this.current];
+
+    var self = this;
+    self.rootScope.$on("date-picked",function(e, date){
+      // self.date = date;
+      self.setCurrent(-1, date);
+      // self.current = self.dates.findIndex((d) => d === date);
+    });
   },
 
   $onChanges: function() {
     
-  },
-
-  pickDate: function(){
-    this.date = "10/1/2017";
-    this.current = -1;
-  },
-
-  setCurrent(idx){
-    this.current = idx;
-    this.date = this.dates[idx];
-    // self.onDateChanged(curDate);
   }
 }
 

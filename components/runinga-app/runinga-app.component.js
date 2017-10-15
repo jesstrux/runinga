@@ -1,7 +1,4 @@
-const remote = require('electron').remote;
-const main = remote.require('./main.js');
-// var detailWindow;
-// detailWindow
+const {ipcRenderer} = require('electron');
 
 angular
   .module('runinga')
@@ -13,29 +10,55 @@ angular
     controller: RuningaApp
   });
 
-function RuningaApp($rootScope) {
+RuningaApp.$inject = ['ShowService', 'Favorites', '$rootScope'];
+
+function RuningaApp(ShowService, Favorites, $rootScope) {
   var self = this;
+  this.showService = ShowService;
+  this.favService = Favorites;
+  this.rootScope = $rootScope;
 }
 
 RuningaApp.prototype = {
   $onInit: function() {
-    
-  },
+    var self = this;
+    this.page = 0;
+    ipcRenderer.on('clear-shows-cache', (event) => {
+      this.clearShowsCache();
+    });
 
-  $onChanges: function() {
-    
-  },
+    ipcRenderer.on('clear-favorites', (event) => {
+      this.clearFavorites();
+    });
 
-  viewShow: function(show){
-    // alert("View show: " + show.name);
-    main.openShowDetails(show);
+    ipcRenderer.on('prefs-changed', (event, prefs) => {
+      self.rootScope.$broadcast('prefs-changed', prefs);
+    });
   },
 
   minimizeApp : function(){
-      require('electron').remote.getCurrentWindow().minimize();
+    ipcRenderer.send('manage-window', {win: 'main', action: "minimize"});
   },
 
   closeApp : function(){
-      require('electron').remote.getCurrentWindow().close();
+    ipcRenderer.send('manage-window', {win: 'main', action: "close"});
+  },
+
+  openSettings: function(){
+    ipcRenderer.send('open-settings');
+  },
+
+  clearShowsCache: function () {
+    this.showService.clearShowsCache([])
+    .then(function(){
+      ipcRenderer.send('shows-cache-cleared');
+    });
+  },
+
+  clearFavorites: function () {
+    this.favService.setFavorites([])
+    .then(function(){
+      ipcRenderer.send('favorites-cleared');
+    });
   }
 }
